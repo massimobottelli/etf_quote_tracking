@@ -42,7 +42,9 @@ table_headers = ["Timestamp", "ISIN", "Quantity", "Quote", "Market Value"]
 table_data = []
 
 # Iterate over each row of the DataFrame with tqdm to display the progress bar
-print("\nRetrieving quotes for the listed ETFs...")
+print("\nETF Quote Tracking"
+      "\n------------------")
+print("Retrieving quotes for the listed ETFs...")
 total_market_value = 0
 for index, row in tqdm(isin_df.iterrows(), desc="Progress", total=len(isin_df),
                        bar_format="{desc}: {percentage:3.0f}%|{bar}|"):
