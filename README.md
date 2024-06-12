@@ -19,7 +19,7 @@ This script retrieves real-time quotes for ETFs based on their ISIN codes from t
 
 ## Usage
 
-1. Record your purchase date, type, ISIN codes and quantity in a CSV file named `portfolio.csv` in the project directory.
+1. Record your assets in a file named `portfolio.csv` in the project directory.
 
    ```csv
    purchase-date,type,ISIN,quantity
@@ -32,16 +32,16 @@ This script retrieves real-time quotes for ETFs based on their ISIN codes from t
    ```bash
    python etf_quote_tracking.py
    ```
-3. The script will retrieve real-time quotes for the provided ISIN codes and save them to a CSV file named `etf_quote_tracking.csv`.
+3. The script will retrieve real-time quotes for the provided ISIN codes, calculate the market value, display a table on screen and save it to a CSV file named `tracking.csv`.
 
 ## Output
 
 The quote of the ETFs will be saved in a CSV file named `etf_quote_tracking.csv` with the following format:
 
 ```csv
-Timestamp,ISIN,Value
-2024-06-12 18:20:08,IE00B5BMR087,528.35
-2024-06-12 18:20:09,IE00B4K48X80,80.37
-2024-06-12 18:20:09,IE00B4L5YX21,50.22
-2024-06-12 18:20:11,IE00B579F325,207.49
+timestamp,ISIN,quantity,quote,market_value
+2024-06-12 19:24:22,IE00B5BMR087,45,528.35,23775.75
+2024-06-12 19:24:23,IE00B4K48X80,225,80.37,18083.25
+2024-06-12 19:24:24,IE00B4L5YX21,180,50.22,9039.6
+2024-06-12 19:24:25,IE00B579F325,38,207.49,7884.62
 ```
