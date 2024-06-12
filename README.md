@@ -19,14 +19,14 @@ This script retrieves real-time quotes for ETFs based on their ISIN codes from t
 
 ## Usage
 
-1. Place your ISIN codes in a CSV file named `isin_codes.csv` in the project directory.
+1. Record your purchase date, type and ISIN codes in a CSV file named `portfolio.csv` in the project directory.
 
    ```csv
-   type,ISIN
-   etf,IE00B5BMR087
-   etf,IE00B4K48X80
-   etf,IE00B4L5YX21
-   etc-etn,IE00B579F325
+   purchase-date,type,ISIN
+   2024-06-10 12:00:00,etf,IE00B5BMR087
+   2024-06-10 12:00:00,etf,IE00B4K48X80
+   2024-06-10 12:00:00,etf,IE00B4L5YX21
+   2024-06-10 12:00:00,etc-etn,IE00B579F325
    ```
 2. Run the script:
    ```bash
