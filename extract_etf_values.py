@@ -19,9 +19,14 @@ def get_realtime_quotes_content(isin, type):
             price_span = price_div.find('strong')
             if price_span:
                 raw_text = price_span.get_text(strip=True)
-                return raw_text
-    else:
-        return f"Error: {response.status_code}"
+                # Check if content is a number in international format (comma for decimal)
+                try:
+                    float_content = float(raw_text.replace(',', '.'))
+                    return float_content
+                except ValueError:
+                    return raw_text
+            else:
+                return f"Error: {response.status_code}"
 
 
 # Read the CSV file with ISINs
@@ -38,6 +43,8 @@ table_headers = ["Timestamp", "ISIN", "Value"]
 table_data = []
 
 # Iterate over each row of the DataFrame with tqdm to display the progress bar
+
+print("\nRetrieving quotes for the listed ETFs...")
 for index, row in tqdm(isin_df.iterrows(), desc="Progress", total=len(isin_df),
                        bar_format="{desc}: {percentage:3.0f}%|{bar}|"):
     type = row['type']
