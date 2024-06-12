@@ -6,7 +6,7 @@ This script retrieves real-time quotes for ETFs based on their ISIN codes from t
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/etf-quote-tracking.git
+   git clone https://github.com/massimobottelli/etf-quote-tracking.git
    ```
 2. Navigate to the project directory:
    ```bash
