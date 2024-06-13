@@ -34,9 +34,16 @@ def read_portfolio(file_path):
 
 
 def save_tracking_data(file_path, data):
-    output_file_exists = os.path.isfile(file_path)
-    with open(file_path, 'a') as f:
-        data.to_csv(f, mode='a', index=False, header=not output_file_exists)
+    if os.path.isfile(file_path):
+        existing_data = pd.read_csv(file_path)
+        existing_timestamps = existing_data['timestamp'].unique()
+        new_timestamp = data['timestamp'].iloc[0]
+
+        if new_timestamp in existing_timestamps:
+            print("Data for the current timestamp already exists. Skipping save.")
+            return
+
+    data.to_csv(file_path, mode='a', index=False, header=not os.path.isfile(file_path))
 
 
 def calculate_value(portfolio_df):
@@ -57,7 +64,7 @@ def calculate_value(portfolio_df):
         market_value = round(quote * quantity, 2)
         total_market_value += market_value
 
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.now().strftime('%Y-%m-%d')
         table_data.append([timestamp, isin, quantity, quote, market_value])
 
     # Add a last row for total market value to the table data
