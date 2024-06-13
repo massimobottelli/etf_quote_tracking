@@ -45,3 +45,7 @@ timestamp,ISIN,quantity,quote,market_value
 2024-06-12,IE00B4L5YX21,180,50.22,9039.6
 2024-06-12,IE00B579F325,38,207.49,7884.62
 ```
+
+## Backlog
+
+Handle additions to the portfolio: if user adds new assets later on, the qualtity considered in the calculation of the value must be the sum of the quantity of the same asset.
