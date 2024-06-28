@@ -46,6 +46,17 @@ def save_tracking_data(file_path, data):
     data.to_csv(file_path, mode='a', index=False, header=not os.path.isfile(file_path))
 
 
+def save_market_value(file_path, date, value):
+    if os.path.isfile(file_path):
+        existing_data = pd.read_csv(file_path)
+        if date in existing_data['date'].values:
+            print(f"Market value for {date} already exists. Skipping save.")
+            return
+
+    new_data = pd.DataFrame({'date': [date], 'market_value': [value]})
+    new_data.to_csv(file_path, mode='a', index=False, header=not os.path.isfile(file_path))
+
+
 def calculate_value(portfolio_df):
     table_headers = ["Timestamp", "ISIN", "Quantity", "Quote", "Market Value"]
     table_data = []
@@ -76,7 +87,7 @@ def calculate_value(portfolio_df):
 
 def display_table(headers, data):
     print(tabulate(data, headers=headers, tablefmt="grid"))
-
+    
 
 def main():
     print("\nETF Quote Tracking"
@@ -91,6 +102,9 @@ def main():
     df_to_save = pd.DataFrame(data[:-1], columns=['timestamp', 'ISIN', 'quantity', 'quote',
                                                   'market_value'])  # Exclude the total row for saving
     save_tracking_data('tracking.csv', df_to_save)
+
+    timestamp = datetime.now().strftime('%Y-%m-%d')
+    save_market_value('market_value.csv', timestamp, total_market_value)
 
     display_table(headers, data)
 
