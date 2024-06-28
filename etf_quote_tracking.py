@@ -1,3 +1,4 @@
+import configparser
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -89,11 +90,18 @@ def calculate_value(portfolio_df):
 def display_table(headers, data):
     print(tabulate(data, headers=headers, tablefmt="grid"))
 
-async def send_telegram_message(value):
-    token = ""
-    chat_id = ""
-    timestamp = datetime.now().strftime('%d/%m/%Y')
 
+def read_telegram_config(file_path='config.ini'):
+    config = configparser.ConfigParser()
+    config.read(file_path)
+    token = config['Telegram']['token']
+    chat_id = config['Telegram']['chat_id']
+    return token, chat_id
+
+
+async def send_telegram_message(value):
+    token, chat_id = read_telegram_config()
+    timestamp = datetime.now().strftime('%d/%m/%Y')
     formatted_value = f"{value:,.2f}".replace('.', 'X').replace(',', '.').replace('X', ',')
     message = f"{timestamp}: {formatted_value} €"
 
