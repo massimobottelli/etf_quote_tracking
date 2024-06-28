@@ -90,8 +90,8 @@ def display_table(headers, data):
     print(tabulate(data, headers=headers, tablefmt="grid"))
 
 async def send_telegram_message(value):
-    token = "7053357211:AAHeONJ876CaEnI7Nk9QYvi-G4dBvVhuPzc"
-    chat_id = "758510321"
+    token = ""
+    chat_id = ""
     timestamp = datetime.now().strftime('%d/%m/%Y')
 
     formatted_value = f"{value:,.2f}".replace('.', 'X').replace(',', '.').replace('X', ',')
