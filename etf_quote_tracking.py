@@ -5,7 +5,8 @@ from datetime import datetime
 from tabulate import tabulate
 from tqdm import tqdm
 import os
-
+import telegram
+import asyncio
 
 def fetch_realtime_quote(isin, type):
     url = f"https://www.borsaitaliana.it/borsa/{type}/scheda/{isin}.html"
@@ -40,7 +41,7 @@ def save_tracking_data(file_path, data):
         new_timestamp = data['timestamp'].iloc[0]
 
         if new_timestamp in existing_timestamps:
-            print("Data for the current timestamp already exists. Skipping save.")
+            print("Tracking for today already exists. Skipping save.")
             return
 
     data.to_csv(file_path, mode='a', index=False, header=not os.path.isfile(file_path))
@@ -50,7 +51,7 @@ def save_market_value(file_path, date, value):
     if os.path.isfile(file_path):
         existing_data = pd.read_csv(file_path)
         if date in existing_data['date'].values:
-            print(f"Market value for {date} already exists. Skipping save.")
+            print(f"Market for today already exists. Skipping save.")
             return
 
     new_data = pd.DataFrame({'date': [date], 'market_value': [value]})
@@ -87,9 +88,19 @@ def calculate_value(portfolio_df):
 
 def display_table(headers, data):
     print(tabulate(data, headers=headers, tablefmt="grid"))
-    
 
-def main():
+async def send_telegram_message(value):
+    token = "7053357211:AAHeONJ876CaEnI7Nk9QYvi-G4dBvVhuPzc"
+    chat_id = "758510321"
+    timestamp = datetime.now().strftime('%d/%m/%Y')
+
+    formatted_value = f"{value:,.2f}".replace('.', 'X').replace(',', '.').replace('X', ',')
+    message = f"{timestamp}: {formatted_value} €"
+
+    bot = telegram.Bot(token)
+    await bot.send_message(chat_id=chat_id, text=message)
+
+async def main():
     print("\nETF Quote Tracking"
           "\n------------------")
     print("Retrieving quotes for the listed ETFs...")
@@ -108,6 +119,8 @@ def main():
 
     display_table(headers, data)
 
+    await send_telegram_message(total_market_value)
+
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
