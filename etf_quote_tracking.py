@@ -30,7 +30,7 @@ def fetch_realtime_quote(isin, type):
 def read_portfolio(file_path):
     if os.path.isfile(file_path):
         return pd.read_csv(file_path)
-    return pd.DataFrame(columns=["timestamp", "ISIN", "quote", "quantity"])
+    return pd.DataFrame(columns=["timestamp", "ISIN", "quote", "quantity", "accrual"])
 
 
 def save_tracking_data(file_path, data):
@@ -56,12 +56,13 @@ def calculate_value(portfolio_df):
         type = row['type']
         isin = row['ISIN']
         quantity = row['quantity']
+        accrual = row['accrual']
 
         quote = fetch_realtime_quote(isin, type)
         if quote is None:
             continue
 
-        market_value = round(quote * quantity, 2)
+        market_value = round(quote * quantity + accrual, 2)
         total_market_value += market_value
 
         timestamp = datetime.now().strftime('%Y-%m-%d')
