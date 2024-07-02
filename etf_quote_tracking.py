@@ -31,8 +31,13 @@ def fetch_realtime_quote(isin, type):
 
 def read_portfolio(file_path):
     if os.path.isfile(file_path):
-        return pd.read_csv(file_path)
-    return pd.DataFrame(columns=["timestamp", "ISIN", "quote", "quantity", "accrual"])
+        df = pd.read_csv(file_path)
+        df["purchase_value"] = df["quantity"] * df["purchase_price"]
+        total_purchase_value = df["purchase_value"].sum()
+        return df, total_purchase_value
+    else:
+        df = pd.DataFrame(columns=["timestamp", "type", "ISIN", "quantity", "accrual", "purchase_price", "purchase_value"])
+        return df, 0
 
 
 def save_tracking_data(file_path, data):
@@ -59,7 +64,7 @@ def save_market_value(file_path, date, value):
     new_data.to_csv(file_path, mode='a', index=False, header=not os.path.isfile(file_path))
 
 
-def calculate_value(portfolio_df):
+def calculate_value(portfolio_df, purchase_value):
     table_headers = ["Timestamp", "ISIN", "Quantity", "Quote", "Market Value"]
     table_data = []
     total_market_value = 0
@@ -83,8 +88,9 @@ def calculate_value(portfolio_df):
 
     # Add a last row for total market value to the table data
     table_data.append(['', '', '', 'Total Market Value:', round(total_market_value, 2)])
+    table_data.append(['', '', '', 'Purchase Value:', round(purchase_value, 2)])
 
-    return table_headers, table_data, total_market_value
+    return table_headers, table_data, round(total_market_value, 2)
 
 
 def display_table(headers, data):
@@ -114,12 +120,12 @@ async def main():
     print("Retrieving quotes for the listed ETFs...")
 
     csv_file = 'portfolio.csv'
-    portfolio_df = read_portfolio(csv_file)
+    portfolio_df, purchase_value = read_portfolio(csv_file)
 
-    headers, data, total_market_value = calculate_value(portfolio_df)
+    headers, data, total_market_value = calculate_value(portfolio_df, purchase_value)
 
-    df_to_save = pd.DataFrame(data[:-1], columns=['timestamp', 'ISIN', 'quantity', 'quote',
-                                                  'market_value'])  # Exclude the total row for saving
+    df_to_save = pd.DataFrame(data[:-2], columns=['timestamp', 'ISIN', 'quantity', 'quote',
+                                                  'market_value'])  # Exclude the total row
     save_tracking_data('tracking.csv', df_to_save)
 
     timestamp = datetime.now().strftime('%Y-%m-%d')
