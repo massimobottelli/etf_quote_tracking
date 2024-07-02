@@ -82,15 +82,17 @@ def calculate_value(portfolio_df, purchase_value):
 
         market_value = round(quote * quantity + accrual, 2)
         total_market_value += market_value
+        variation = round((total_market_value - purchase_value) / purchase_value * 100, 2)
 
         timestamp = datetime.now().strftime('%Y-%m-%d')
         table_data.append([timestamp, isin, quantity, quote, market_value])
 
-    # Add a last row for total market value to the table data
-    table_data.append(['', '', '', 'Total Market Value:', round(total_market_value, 2)])
-    table_data.append(['', '', '', 'Purchase Value:', round(purchase_value, 2)])
+    # Add a last rows for purchase and market value to the table data
+    table_data.append(['', '', '', 'Total Market Value:', total_market_value])
+    table_data.append(['', '', '', 'Purchase Value:', purchase_value])
+    table_data.append(['', '', '', 'Variation:', str(variation) + '%'])
 
-    return table_headers, table_data, round(total_market_value, 2)
+    return table_headers, table_data, round(total_market_value, 2), variation
 
 
 def display_table(headers, data):
@@ -105,11 +107,11 @@ def read_telegram_config(file_path='config.ini'):
     return token, chat_id
 
 
-async def send_telegram_message(value):
+async def send_telegram_message(value, variation):
     token, chat_id = read_telegram_config()
     timestamp = datetime.now().strftime('%d/%m/%Y')
     formatted_value = f"{value:,.2f}".replace('.', 'X').replace(',', '.').replace('X', ',')
-    message = f"{timestamp}: {formatted_value} €"
+    message = f"{timestamp}: {formatted_value} € ({variation}%)"
 
     bot = telegram.Bot(token)
     await bot.send_message(chat_id=chat_id, text=message)
@@ -122,9 +124,9 @@ async def main():
     csv_file = 'portfolio.csv'
     portfolio_df, purchase_value = read_portfolio(csv_file)
 
-    headers, data, total_market_value = calculate_value(portfolio_df, purchase_value)
+    headers, data, total_market_value, variation = calculate_value(portfolio_df, purchase_value)
 
-    df_to_save = pd.DataFrame(data[:-2], columns=['timestamp', 'ISIN', 'quantity', 'quote',
+    df_to_save = pd.DataFrame(data[:-3], columns=['timestamp', 'ISIN', 'quantity', 'quote',
                                                   'market_value'])  # Exclude the total row
     save_tracking_data('tracking.csv', df_to_save)
 
@@ -133,7 +135,7 @@ async def main():
 
     display_table(headers, data)
 
-    await send_telegram_message(total_market_value)
+    await send_telegram_message(total_market_value, variation)
 
 
 if __name__ == "__main__":
